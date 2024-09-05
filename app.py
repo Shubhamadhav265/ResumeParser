@@ -5,7 +5,7 @@ import PyPDF2 as pdf
 from dotenv import load_dotenv
 import json
 import re
-import spacy
+# import spacy
 
 # Load environment variables
 load_dotenv()
@@ -61,8 +61,6 @@ def extract_skills(text):
     return list(set(skills))
 
 
-
-
 def match_skills(resume_skills, job_description_skills):
     resume_skill_set = set(resume_skills)
     job_skill_set = set(job_description_skills)
@@ -81,9 +79,14 @@ def match_skills(resume_skills, job_description_skills):
     return matching_skills, missing_skills
 
 def get_gemini_response(prompt):
-    model = genai.GenerativeModel('gemini-pro')
-    response = model.generate_content(prompt)
-    return response.text
+    try:
+        model = genai.GenerativeModel('gemini-pro')
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"Error with API call: {e}")
+        return None
+
 
 def input_pdf_text(uploaded_file):
     reader = pdf.PdfReader(uploaded_file)
@@ -92,6 +95,7 @@ def input_pdf_text(uploaded_file):
         page = reader.pages[page]
         text += str(page.extract_text())
     return text
+
 
 # Streamlit app
 st.title("Smart ATS")
@@ -124,34 +128,99 @@ if submit:
         Sec_matching_skills, Sec_missing_skills = match_skills(resume_skills, jd_Secondary_Skills)
         Oth_matching_skills, Oth_missing_skills = match_skills(resume_skills, jd_Other_Skills)
         
-        # Construct the response JSON manually
-        response_data = {
-            "Primary Matching Skills": Pri_matching_skills,
-            "Primary Missing Skills": Pri_missing_skills,
-            "Number of Matching Primary Skills": len(Pri_matching_skills),
-            "Number of Missing Primary Skills": len(Pri_missing_skills),
-            "Total Required Primary Skills": len(Pri_matching_skills) + len(Pri_missing_skills),
-            "Percentage Primary Skill Match": round((len(Pri_matching_skills)/(len(Pri_matching_skills) + len(Pri_missing_skills)))*100, 2),
-
-            "Secondary Matching Skills": Sec_matching_skills,
-            "Secondary Missing Skills": Sec_missing_skills,
-            "Number of Matching Secondary Skills": len(Sec_matching_skills),
-            "Number of Missing Secondary Skills": len(Sec_missing_skills),
-            "Total Required Secondary Skills": len(Sec_matching_skills) + len(Sec_missing_skills),
-            "Percentage Secondary Skill Match": round((len(Sec_matching_skills)/(len(Sec_matching_skills) + len(Sec_missing_skills)))*100, 2),
+        # Percentage Primary, Secondary and Other Skill match
+        per_primary_skill_match = round((len(Pri_matching_skills)/(len(Pri_matching_skills) + len(Pri_missing_skills)))*100, 2)
+        per_secondary_skill_match = round((len(Sec_matching_skills)/(len(Sec_matching_skills) + len(Sec_missing_skills)))*100, 2)
+        per_other_skill_match = round((len(Oth_matching_skills)/(len(Oth_matching_skills) + len(Oth_missing_skills)))*100, 2)
 
 
-            "Other Matching Skills": Oth_matching_skills,
-            "Other Missing Skills": Oth_missing_skills,
-            "Number of Matching Other Skills": len(Oth_matching_skills),
-            "Number of Missing Other Skills": len(Oth_missing_skills),
-            "Total Required Other Skills": len(Oth_matching_skills) + len(Oth_missing_skills),
-            "Percentage Other Skill Match": round((len(Oth_matching_skills)/(len(Oth_matching_skills) + len(Oth_missing_skills)))*100, 2)
+        input_prompt = f"""
+        As an advanced Application Tracking System (ATS) with expertise in the tech field, analyze the following resume and provide a response in a single string with the following structure:
 
-        }
+        {{
+            "all_skills": [], 
+            "work_skills": [], 
+            "project_skills": [], 
+            "total_publications": 0, 
+            "copyrights": 0, 
+            "patents": 0, 
+            "certifications": [], 
+            "hackathon_participation": 0
+        }}
 
-        # Display the updated response
-        st.text_area("Analysis Result", json.dumps(response_data, indent=4), height=300)
+        1. **all_skills**: A list of all skills mentioned in the resume.
+        2. **work_skills**: A list of skills specifically mentioned or inferred from the work experience section of the resume.
+        3. **project_skills**: A list of skills used or learned from the project section of the resume.
+        4. **total_publications**: The total count of publications mentioned in the resume.
+        5. **copyrights**: The total count of copyrights mentioned in the resume.
+        6. **patents**: The total count of patents mentioned in the resume.
+        7. **certifications**: A list of certifications mentioned in the resume.
+        8. **hackathon_participation**: A Flag value indicating if hackathon participation is mentioned (If yes, return 1, else return 0).
+
+        **Resume**: {text}
+        """
+
+        # Extracting the prompt Response and Multiple Resume Details
+        gem_response = get_gemini_response(input_prompt)
+
+        if gem_response:
+                    try:
+                        # Try to parse the response as JSON
+                        gem_response_data = json.loads(gem_response)
+
+                        # Store the Workeperience, Project, Publications, Patent, Copyright, Certifications and Hackathons
+                        # in the form of List's
+                        work_skills = gem_response_data["work_skills"]
+                        project_skills = gem_response_data["project_skills"]
+                        total_publications = gem_response_data["total_publications"]
+                        copyrights = gem_response_data["copyrights"]
+                        patents = gem_response_data["patents"]
+                        certifications = gem_response_data["certifications"]
+                        hackathon_participation = gem_response_data["hackathon_participation"]
+
+                        # Construct the response JSON manually
+                        response_data = {
+                             
+                            "Primary Matching Skills": Pri_matching_skills,
+                            "Primary Missing Skills": Pri_missing_skills,
+                            "Number of Matching Primary Skills": len(Pri_matching_skills),
+                            "Number of Missing Primary Skills": len(Pri_missing_skills),
+                            "Total Required Primary Skills": len(Pri_matching_skills) + len(Pri_missing_skills),
+                            "Percentage Primary Skill Match": per_primary_skill_match,
+
+                            "Secondary Matching Skills": Sec_matching_skills,
+                            "Secondary Missing Skills": Sec_missing_skills,
+                            "Number of Matching Secondary Skills": len(Sec_matching_skills),
+                            "Number of Missing Secondary Skills": len(Sec_missing_skills),
+                            "Total Required Secondary Skills": len(Sec_matching_skills) + len(Sec_missing_skills),
+                            "Percentage Secondary Skill Match": per_secondary_skill_match,
+
+                            "Other Matching Skills": Oth_matching_skills,
+                            "Other Missing Skills": Oth_missing_skills,
+                            "Number of Matching Other Skills": len(Oth_matching_skills),
+                            "Number of Missing Other Skills": len(Oth_missing_skills),
+                            "Total Required Other Skills": len(Oth_matching_skills) + len(Oth_missing_skills),
+                            "Percentage Other Skill Match": per_other_skill_match,
+
+
+                            "Work Skills": work_skills,
+                            "Project Skills": project_skills,
+                            "Total Publications": total_publications,
+                            "Copyrights": copyrights,
+                            "Patents": patents,
+                            "Certifications": certifications,
+                            "Hackathon Participation": hackathon_participation
+                        }
+
+                        # Display the updated response
+                        st.text_area("Analysis Result", json.dumps(response_data, indent=4), height=300)
+
+                    except json.JSONDecodeError as e:
+                        st.error(f"Failed to parse JSON response: {e}")
+                        st.text_area("Gemini API Response", gem_response, height=300)
+        else:
+            st.warning("Gemini API call failed or returned an empty response.")
 
     else:
         st.warning("Please upload a resume and enter a job description.")
+
