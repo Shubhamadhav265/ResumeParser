@@ -14,44 +14,84 @@ load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
-# Example predefined list of skills (expand this list based on domain)
 predefined_skills = [
-    "Python", "Java", "JavaScript", "C++", "CPP", "Machine Learning", "Data Analysis", "SQL", "Project Management", "Communication",
-    "Ruby", "Go", "Swift", "Kotlin", "PHP", "TypeScript", "R", "Tailwind", "Openshift",
-    "HTML", "CSS", "React", "Angular", "Vue.js", "Node.js", "Express.js",
-    "Flutter", "React Native",
-    "Object-Oriented Design", "Design Patterns", "System Architecture", "UML",
-    "Git", "GitHub", "GitLab", "Bitbucket",
-    "NoSQL", "MongoDB", "PostgreSQL", "MySQL", "Oracle",
-    "Unit Testing", "Integration Testing", "Test-Driven Development (TDD)", "Selenium", "JUnit", "pytest",
-    "Docker", "Kubernetes", "CI/CD", "Jenkins", "Terraform", "Ansible",
-    "AWS", "Azure", "Google Cloud Platform (GCP)",
-    "Trees", "Graphs", "Hash Tables", "Sorting Algorithms", "Search Algorithms",
-    "Encryption", "Authentication", "Authorization", "OWASP", "Penetration Testing",
-    "Visual Studio Code", "IntelliJ IDEA", "Eclipse", "PyCharm", "Xcode",
-    "Jira", "Trello", "Asana", "Basecamp",
-    "Slack", "Microsoft Teams", "Zoom",
-    "pgAdmin", "MySQL Workbench", "MongoDB Compass",
-    "Maven", "Gradle", "npm",
-    "Introduction to Computer Science", "Data Structures and Algorithms", "Software Engineering Principles", 
-    "Operating Systems", "Database Systems", "Computer Networks", "Web Development", "Mobile App Development", 
-    "Machine Learning and Data Science", "Cybersecurity", "Software Testing and Quality Assurance", 
-    "Human-Computer Interaction", "Software Design and Architecture",
-    "Discrete Mathematics", "Linear Algebra", "Calculus", "Probability and Statistics", "Algorithms and Complexity",
-    "Computer Architecture", "Compiler Design", "Operating System Design", "Computer Graphics", "Artificial Intelligence",
-    "Software Engineering Ethics", "Database Design", "Network Security", "Cloud Computing", "Big Data Technologies",
-    # Java Libraries
-    "Spring Framework", "Hibernate", "Apache Commons", "Guava", "Log4j", "Jackson", "JUnit", "Maven", "Gradle",
-    # C++ Libraries
-    "Boost", "STL (Standard Template Library)", "Eigen", "Qt", "Poco", "OpenCV", "Cereal", "TBB (Threading Building Blocks)",
-    # Python Libraries
-    "NumPy", "Pandas", "Matplotlib", "Scikit-learn", "TensorFlow", "Keras", "PyTorch", "Django", "Flask", "Requests", 
-    "BeautifulSoup", "SQLAlchemy", "Celery", "OpenCV", "NLTK", "SciPy"
+    # Programming Languages
+    "Python", "Java", "JavaScript", "C++", "CPP", "C", "C#", "Ruby", "Go", "Swift", "Kotlin", "PHP", "TypeScript", "R", 
+    "Shell Scripting", "Scala", "Perl", "Rust", "Dart", "Elixir", "Haskell", "Lua", "Objective-C", "MATLAB", 
+    "VHDL", "Verilog", "Solidity",   
+    # Web Development Frameworks and Tools
+    "HTML", "CSS", "Tailwind", "Bootstrap", "SASS", "LESS", "React", "Angular", "Vue.js", "Node.js", "Express.js",
+    "Django", "Flask", "ASP.NET", "Ruby on Rails", "Next.js", "Gatsby", "Nuxt.js", "jQuery", "Svelte", "WebAssembly",
+    # Mobile Development Frameworks
+    "Flutter", "React Native", "SwiftUI", "Xamarin", "Ionic", "Cordova", "Kotlin Multiplatform", "NativeScript",
+    # Cloud Platforms and Services
+    "AWS", "Azure", "Google Cloud Platform (GCP)", "IBM Cloud", "Oracle Cloud", "Heroku", "DigitalOcean", 
+    "CloudFormation", "Lambda", "API Gateway", "EC2", "S3", "Route 53", "Azure DevOps", "GCP BigQuery", "Kubernetes",
+    # DevOps & CI/CD Tools
+    "Docker", "Kubernetes", "Jenkins", "Terraform", "Ansible", "Chef", "Puppet", "Vagrant", "CircleCI", "TravisCI",
+    "GitLab CI", "Bitbucket Pipelines", "SonarQube", "Artifactory", "Nagios", "Prometheus", "Grafana", "ELK Stack (Elasticsearch, Logstash, Kibana)", 
+    "New Relic", "Splunk", "PagerDuty", "Istio", "OpenShift", "ArgoCD", "Nomad",
+    # Version Control & Collaboration Tools
+    "Git", "GitHub", "GitLab", "Bitbucket", "Perforce", "Subversion (SVN)", "Mercurial",
+    # Databases
+    "MySQL", "PostgreSQL", "MongoDB", "SQLite", "Oracle", "SQL Server", "MariaDB", "Cassandra", "Redis", "DynamoDB",
+    "CouchDB", "Memcached", "Firestore", "Couchbase", "Neo4j", "Elasticsearch", "ClickHouse", "InfluxDB", "TimescaleDB", 
+    "CockroachDB", "HBase", "Hive", "PrestoDB",
+    # Machine Learning & Data Science Libraries/Tools
+    "Pandas", "NumPy", "Matplotlib", "Seaborn", "Scikit-learn", "TensorFlow", "Keras", "PyTorch", "OpenCV", "XGBoost", 
+    "LightGBM", "CatBoost", "NLTK", "SpaCy", "Hugging Face Transformers", "SciPy", "Statsmodels", "Dask", "PySpark", 
+    "Airflow", "Hadoop", "Kafka", "MLflow", "Kubeflow", "Tidyverse", "Jupyter Notebooks", 
+    # Natural Language Processing (NLP) and AI Tools
+    "Speech Recognition", "TextBlob", "BERT", "GPT", "Transformer Networks", "Word2Vec", "FastText", "GloVe", 
+    "OpenAI API", "DeepSpeech", "CoreNLP", "AllenNLP", "Fairseq", "Dialogflow", "Rasa",
+    # Software Testing & QA
+    "Selenium", "JUnit", "pytest", "TestNG", "Cucumber", "Mocha", "Chai", "Jest", "Postman", "SoapUI", "LoadRunner", 
+    "JMeter", "Appium", "Robot Framework", "Cypress", "Protractor", "SpecFlow", "QTest", "TestComplete", "Zephyr",
+    # System Administration & Infrastructure
+    "Linux", "Bash", "PowerShell", "Windows Server", "Unix", "VMware", "Hyper-V", "OpenStack", "Zabbix", "Nagios", 
+    "pfSense", "HAProxy", "Nginx", "Apache HTTP Server", "Tomcat", "IIS", "FreeBSD", "OpenBSD", "AWS Lambda", 
+    # Networking & Security
+    "TCP/IP", "DNS", "DHCP", "HTTP", "HTTPS", "Load Balancing", "VPN", "SSH", "SSL/TLS", "Firewalls", "Routing Protocols", 
+    "OSI Model", "Wireshark", "Nmap", "Snort", "Penetration Testing", "OWASP", "Burp Suite", "Metasploit", 
+    "Kali Linux", "Suricata", "SOC", "SIEM", "IDS/IPS", "Endpoint Security", "Zero Trust", "OAuth", "SAML", "IAM", "PKI", 
+    "SSL Certificates", "WAF", "Cloud Security", "Encryption", "AES", "RSA", "Two-Factor Authentication", 
+    # Big Data & Data Engineering Tools
+    "Hadoop", "Spark", "Flink", "Kafka", "Storm", "Hive", "Pig", "Presto", "Airflow", "NiFi", "HDFS", "Cloudera", 
+    "Databricks", "EMR", "MapReduce", "Delta Lake", "Snowflake", "Redshift", "BigQuery", "Azure Data Lake",
+    # Business Intelligence & Data Visualization Tools
+    "Tableau", "Power BI", "Looker", "Qlik", "Google Data Studio", "D3.js", "Plotly", "ggplot2", "Metabase", "Grafana",
+    # Software Design & Architecture
+    "Microservices", "RESTful API", "GraphQL", "gRPC", "Service-Oriented Architecture (SOA)", "Event-Driven Architecture",
+    "CQRS", "Domain-Driven Design (DDD)", "Test-Driven Development (TDD)", "Behavior-Driven Development (BDD)",
+    "Clean Architecture", "Serverless Architecture", "Event Sourcing", "Pub/Sub Architecture", 
+    # Miscellaneous Tools & Technologies
+    "VS Code", "IntelliJ IDEA", "Eclipse", "PyCharm", "Xcode", "NetBeans", "Android Studio", "Atom", "Sublime Text",
+    "Maven", "Gradle", "npm", "Yarn", "Webpack", "Parcel", "Babel", "ESLint", "Prettier", "SonarLint", "Figma", 
+    "Adobe XD", "Sketch", "InVision", "Zeplin", "Lucidchart", "Microsoft Visio", "PlantUML", "Draw.io", 
+    # Soft Skills
+    "Collaboration", "Communication", "Teamwork", "Problem Solving", "Time Management", "Leadership", 
+    "Creativity", "Critical Thinking", "Adaptability", "Emotional Intelligence", "Public Speaking", "Negotiation",
+    "Conflict Resolution", "Empathy", "Decision Making", "Strategic Thinking", "Interpersonal Skills", 
+    "Organizational Skills", "Customer Service", "Networking",
+    # Emerging Technologies
+    "Blockchain", "NFTs", "Smart Contracts", "IoT", "AR/VR", "Metaverse", "Quantum Computing", "5G", "Edge Computing", 
+    "3D Printing", "Wearable Technology", "Autonomous Systems", "Robotic Process Automation (RPA)", "Biotechnology", 
+    "Synthetic Biology", "Nanotechnology", "Cognitive Computing", "Augmented Reality", "Virtual Reality",
+    # Additional Skills
+    "SQL", "Git", "Linux", "AWS", "Docker", "Kubernetes", "MySQL Workbench", "OpenShift", "CyberSecurity", 
+    "Tkinter", "SMTP", "Object-Oriented Programming (OOP)", "Data Structures and Algorithms", "Cloudinary", 
+    "Slack", "React.js", "Azure", "GitHub", "Selenium", "TensorFlow"
 ]
+
+
 
 def extract_skills(text):
     # Convert text to lowercase for case-insensitive matching
-    text = text.lower()
+    # If text is a list, convert it to a single string
+    if isinstance(text, list):
+        text = ' '.join(text).lower()  # Join the list into a single string and convert to lowercase
+    else:
+        text = text.lower()  # If text is a string, convert to lowercase
     
     # Extract exact keyword matches from the predefined skills list
     skills = [skill for skill in predefined_skills if re.search(r'\b' + re.escape(skill.lower()) + r'\b', text)]
@@ -77,6 +117,7 @@ def match_skills(resume_skills, job_description_skills):
     missing_skills = list(set(missing_skills))
 
     return matching_skills, missing_skills
+
 
 def get_gemini_response(prompt):
     try:
@@ -178,6 +219,31 @@ if submit:
                         certifications = gem_response_data["certifications"]
                         hackathon_participation = gem_response_data["hackathon_participation"]
 
+
+                        # Refining Skills once again with the predefined skills
+                        ref_work_skills = extract_skills(' '.join(work_skills))  # Convert list to string
+                        ref_project_skills = extract_skills(' '.join(project_skills))  # Convert list to string
+
+
+                                                
+                        # Matching the work and project skills with primary and secondary skills
+                        Pri_work_matching_skills, Pri_work_missing_skills = match_skills(ref_work_skills, jd_Primary_Skills)
+                        Sec_work_matching_skills, Sec_work_missing_skills = match_skills(ref_work_skills, jd_Secondary_Skills)
+                        
+                        Pri_project_matching_skills, Pri_project_missing_skills = match_skills(ref_project_skills, jd_Primary_Skills)
+                        Sec_project_matching_skills, Sec_project_missing_skills = match_skills(ref_project_skills, jd_Secondary_Skills)
+
+
+                        # Percentage match of the primary and secondary skills of  work and project respectively.
+                        per_pri_work_matching_skills = round(((len(Pri_work_matching_skills))/(len(jd_Primary_Skills))) * 100, 2)
+                        per_sec_work_matching_skills = round(((len(Sec_work_matching_skills))/(len(jd_Secondary_Skills))) * 100, 2)
+
+                        per_pri_project_matching_skills = round(((len(Pri_project_matching_skills))/(len(jd_Primary_Skills))) * 100, 2)
+                        per_sec_project_matching_skills = round(((len(Sec_project_matching_skills))/(len(jd_Secondary_Skills))) * 100, 2)
+
+
+
+
                         # Construct the response JSON manually
                         response_data = {
                              
@@ -202,14 +268,28 @@ if submit:
                             "Total Required Other Skills": len(Oth_matching_skills) + len(Oth_missing_skills),
                             "Percentage Other Skill Match": per_other_skill_match,
 
-
                             "Work Skills": work_skills,
                             "Project Skills": project_skills,
                             "Total Publications": total_publications,
                             "Copyrights": copyrights,
                             "Patents": patents,
                             "Certifications": certifications,
-                            "Hackathon Participation": hackathon_participation
+                            "Hackathon Participation": hackathon_participation, 
+
+                            "Primary Skills From Work-Eperience": Pri_work_matching_skills,
+                            "Secondary Skills From Work-Eperience": Sec_work_matching_skills,
+                            "Number of Pri_Work_Skills": len(Pri_work_matching_skills),
+                            "Number of Sec_Work_Skills": len(Sec_work_matching_skills),
+                            "Percentage Pri_work_Skill_Match": per_pri_work_matching_skills,
+                            "Percentage Sec_work_Skill_Match": per_sec_work_matching_skills,
+
+                            "Primary Skills From Projects": Pri_project_matching_skills,
+                            "Secondary Skills From Projects": Sec_project_matching_skills,
+                            "Number of Pri_Projects_Skills": len(Pri_project_matching_skills),
+                            "Number of Sec_Projects_Skills": len(Sec_project_matching_skills),
+                            "Percentage Pri_Projects_Skill_Match": per_pri_project_matching_skills,
+                            "Jd_Sec_Skills": jd_Secondary_Skills,
+                            "Percentage Sec_Projects_Skill_Match": per_sec_project_matching_skills
                         }
 
                         # Display the updated response
@@ -223,4 +303,4 @@ if submit:
 
     else:
         st.warning("Please upload a resume and enter a job description.")
-
+        
