@@ -7,10 +7,10 @@ import json
 import re
 
 
-# Load environment variables
+# Loading environment variables from .env to Python-Environment
 load_dotenv()
 
-# Configure the API
+# Configuring the Grmini-Pro API
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
@@ -83,15 +83,69 @@ predefined_skills = [
     "Slack", "React.js", "Azure", "GitHub", "Selenium", "TensorFlow"
 ]
 
+# Pre-Defining the standard Certification Courses
+standard_certifications = [
+    "AWS Certified Solutions Architect – Associate",
+    "Certified Kubernetes Administrator (CKA)",
+    "Google Professional Cloud Architect",
+    "Microsoft Certified: Azure Solutions Architect Expert",
+    "Certified Information Systems Security Professional (CISSP)",
+    "AWS Certified Developer – Associate",
+    "Certified Ethical Hacker (CEH)",
+    "Cisco Certified Network Associate (CCNA)",
+    "CompTIA Security+",
+    "Microsoft Certified: Azure Fundamentals",
+    "Google Professional Data Engineer",
+    "AWS Certified Cloud Practitioner",
+    "Certified ScrumMaster (CSM)",
+    "AWS Certified DevOps Engineer – Professional",
+    "Microsoft Certified: Azure DevOps Engineer Expert",
+    "CompTIA Network+",
+    "Certified Information Security Manager (CISM)",
+    "Cisco Certified Network Professional (CCNP)",
+    "Google Associate Cloud Engineer",
+    "PMP: Project Management Professional",
+    "Certified Software Development Professional (CSDP)",
+    "Microsoft Certified: Azure Administrator Associate",
+    "Oracle Certified Java Programmer",
+    "VMware Certified Professional (VCP)",
+    "AWS Certified Security – Specialty",
+    "Certified Cloud Security Professional (CCSP)",
+    "Microsoft Certified: Power Platform Fundamentals",
+    "Red Hat Certified Engineer (RHCE)",
+    "TOGAF 9 Certification",
+    "AWS Certified Big Data – Specialty",
+    "ITIL 4 Foundation Certification",
+    "Microsoft Certified: Power BI Data Analyst Associate",
+    "Certified Information Systems Auditor (CISA)",
+    "Google Professional Cloud Developer",
+    "Salesforce Certified Platform Developer I",
+    "Certified in Risk and Information Systems Control (CRISC)",
+    "Microsoft Certified: Dynamics 365 Fundamentals",
+    "Adobe Certified Expert (ACE)",
+    "Cloudera Certified Data Analyst",
+    "Certified Data Privacy Solutions Engineer (CDPSE)",
+    "HashiCorp Certified: Terraform Associate",
+    "Certified Agile Leadership (CAL)",
+    "Google Professional Machine Learning Engineer",
+    "AWS Certified Machine Learning – Specialty",
+    "Scrum.org Professional Scrum Master (PSM I)",
+    "Microsoft Certified: Security, Compliance, and Identity Fundamentals",
+    "Cisco Certified DevNet Professional",
+    "Oracle Database SQL Certified Associate",
+    "Certified Blockchain Developer",
+    "Certified JavaScript Developer (CIW)"
+]
 
 
 def extract_skills(text):
     # Convert text to lowercase for case-insensitive matching
-    # If text is a list, convert it to a single string
+
+    # If text is a list, converting it to a single string (Like if JD comes in the form of String)
     if isinstance(text, list):
         text = ' '.join(text).lower()  # Join the list into a single string and convert to lowercase
     else:
-        text = text.lower()  # If text is a string, convert to lowercase
+        text = text.lower()  # If text is a string, converting it to lowercase
     
     # Extract exact keyword matches from the predefined skills list
     skills = [skill for skill in predefined_skills if re.search(r'\b' + re.escape(skill.lower()) + r'\b', text)]
@@ -108,7 +162,7 @@ def match_skills(resume_skills, job_description_skills):
     matching_skills = [skill for skill in job_skill_set if skill in resume_skill_set]
     missing_skills = [skill for skill in job_skill_set if skill not in matching_skills]
 
-    # Handle partial matches or variations
+    # Putting non-matching skills into missing_skills list
     for job_skill in job_description_skills:
         if not any(resume_skill.lower() in job_skill.lower() for resume_skill in resume_skills):
             missing_skills.append(job_skill)
@@ -156,7 +210,11 @@ if submit:
         text = input_pdf_text(uploaded_file)
         
         # Display the extracted text for debugging
-        st.text_area("Extracted Resume Text", text, height=300)
+        # st.text_area("Extracted Resume Text", text, height=300, disabled=True)
+        st.markdown("###### Etracted Resume")
+
+
+        st.code(text, language='text')
         
         # Extract skills from resume and job description
         resume_skills = extract_skills(text)
@@ -224,7 +282,6 @@ if submit:
                         ref_work_skills = extract_skills(' '.join(work_skills))  # Convert list to string
                         ref_project_skills = extract_skills(' '.join(project_skills))  # Convert list to string
 
-
                                                 
                         # Matching the work and project skills with primary and secondary skills
                         Pri_work_matching_skills, Pri_work_missing_skills = match_skills(ref_work_skills, jd_Primary_Skills)
@@ -248,6 +305,17 @@ if submit:
                             per_filing_score = 5
                         else:
                             per_filing_score = 0
+
+                        # Certifications Score Calculation
+                        matching_certifications = set(certifications).intersection(standard_certifications)
+                        count_matching_std_certifications = len(matching_certifications)
+                        
+                        per_certi_Score = 0
+                        if count_matching_std_certifications >= 1:
+                            per_certi_Score = 5
+                        else:
+                            per_certi_Score = 3
+
                      
                         # Hackathon Score Calculation
                         per_hackathon_score = 0
@@ -257,9 +325,9 @@ if submit:
                             per_hackathon_score = 0
 
                         # Final Rubrick Formula
-                        Final_score = (0.4 * per_primary_skill_match) + (0.2 * per_secondary_skill_match) + (0.1 * per_other_skill_match) + (0.056 * per_pri_work_matching_skills) + (0.024 * per_sec_work_matching_skills) + (0.056 * per_pri_project_matching_skills) + (0.024 * per_sec_project_matching_skills) + (per_filing_score) + (per_hackathon_score)
+                        Final_score = (0.4 * per_primary_skill_match) + (0.2 * per_secondary_skill_match) + (0.1 * per_other_skill_match) + (0.056 * per_pri_work_matching_skills) + (0.024 * per_sec_work_matching_skills) + (0.056 * per_pri_project_matching_skills) + (0.024 * per_sec_project_matching_skills) + (per_filing_score) + (per_certi_Score) + (per_hackathon_score) 
 
-                        # Construct the response JSON manually
+                        # Constructing the response JSON manually
                         response_data = {
                              
                             "Primary Matching Skills": Pri_matching_skills,
@@ -311,8 +379,12 @@ if submit:
                             "Final Resume Score": Final_score
                         }
 
-                        # Display the updated response
+                        # Displaying  the updated response
                         st.text_area("Analysis Result", json.dumps(response_data, indent=4), height=300)
+
+                        st.markdown("###### Final Score")
+                        st.code(Final_score, language='text')
+                        
 
                     except json.JSONDecodeError as e:
                         st.error(f"Failed to parse JSON response: {e}")
@@ -322,3 +394,6 @@ if submit:
 
     else:
         st.warning("Please upload a resume and enter a job description.")
+
+
+
