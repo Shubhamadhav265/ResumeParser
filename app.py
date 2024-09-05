@@ -5,7 +5,7 @@ import PyPDF2 as pdf
 from dotenv import load_dotenv
 import json
 import re
-# import spacy
+
 
 # Load environment variables
 load_dotenv()
@@ -241,8 +241,23 @@ if submit:
                         per_pri_project_matching_skills = round(((len(Pri_project_matching_skills))/(len(jd_Primary_Skills))) * 100, 2)
                         per_sec_project_matching_skills = round(((len(Sec_project_matching_skills))/(len(jd_Secondary_Skills))) * 100, 2)
 
+                        # Sum of Publications, Copyrights and Patents and the final percentage score calculation
+                        filing_total = total_publications + copyrights + patents
+                        per_filing_score = 0
+                        if filing_total >= 1:
+                            per_filing_score = 5
+                        else:
+                            per_filing_score = 0
+                     
+                        # Hackathon Score Calculation
+                        per_hackathon_score = 0
+                        if hackathon_participation == 1:
+                            per_hackathon_score = 4
+                        else:
+                            per_hackathon_score = 0
 
-
+                        # Final Rubrick Formula
+                        Final_score = (0.4 * per_primary_skill_match) + (0.2 * per_secondary_skill_match) + (0.1 * per_other_skill_match) + (0.056 * per_pri_work_matching_skills) + (0.024 * per_sec_work_matching_skills) + (0.056 * per_pri_project_matching_skills) + (0.024 * per_sec_project_matching_skills) + (per_filing_score) + (per_hackathon_score)
 
                         # Construct the response JSON manually
                         response_data = {
@@ -289,7 +304,11 @@ if submit:
                             "Number of Sec_Projects_Skills": len(Sec_project_matching_skills),
                             "Percentage Pri_Projects_Skill_Match": per_pri_project_matching_skills,
                             "Jd_Sec_Skills": jd_Secondary_Skills,
-                            "Percentage Sec_Projects_Skill_Match": per_sec_project_matching_skills
+                            "Percentage Sec_Projects_Skill_Match": per_sec_project_matching_skills,
+
+                            "Total Filings": filing_total,
+
+                            "Final Resume Score": Final_score
                         }
 
                         # Display the updated response
@@ -303,4 +322,3 @@ if submit:
 
     else:
         st.warning("Please upload a resume and enter a job description.")
-        
