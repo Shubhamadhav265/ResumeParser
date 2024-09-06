@@ -192,9 +192,9 @@ def input_pdf_text(uploaded_file):
     return text
 
 
-# Streamlit app
-st.title("Smart ATS")
-st.text("Improve Your Resume ATS")
+# Resume Parser
+st.title("Resume Parser")
+st.text("Determine your Resume Score")
 
 Primary_Skills = st.text_area("Enter the Primary Skills")
 Secondary_Skills = st.text_area("Enter the Secondary Skills")
