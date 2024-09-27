@@ -209,14 +209,14 @@ if submit:
     if uploaded_file is not None and Primary_Skills and Secondary_Skills and Other_Skills:
         res = input_pdf_text(uploaded_file)
         
-        skills_etraction = f""" From the following resume text, extract all skills mentioned under any 
+        skills_extraction = f""" From the following resume text, extract all skills mentioned under any 
                                 section labeled 'Technical Skills,' 'Skills,' or similar. If the resume 
                                 contains skills mentioned in other sections, extract them as well. Return 
                                 only the skills as a comma-separated list, with no additional information or 
                                 formatting. Ensure the output is in a single line and consistent across 
                                 multiple runs. **Resume**: {res} """
 
-        text = get_gemini_response(skills_etraction)
+        text = get_gemini_response(skills_extraction)
         # Display the extracted text for debugging
         # st.text_area("Extracted Resume Text", text, height=300, disabled=True)
         st.markdown("###### Etracted Resume")
@@ -264,7 +264,7 @@ if submit:
         7. **certifications**: A list of certifications mentioned in the resume.
         8. **hackathon_participation**: A Flag value indicating if hackathon participation is mentioned (If yes, return 1, else return 0).
 
-        **Resume**: {text}
+        **Resume**: {res}
         """
 
         # Extracting the prompt Response and Multiple Resume Details
@@ -290,13 +290,16 @@ if submit:
                         ref_work_skills = extract_skills(' '.join(work_skills))  # Convert list to string
                         ref_project_skills = extract_skills(' '.join(project_skills))  # Convert list to string
 
+                        # Work & Project skills present in the skill section of the resume
+                        skillmatch_work_skills, skillmiss_work_skills = match_skills(ref_work_skills, resume_skills)
+                        skillmatch_proj_skills, skillmiss_proj_skills = match_skills(ref_project_skills, resume_skills)
                                                 
                         # Matching the work and project skills with primary and secondary skills
-                        Pri_work_matching_skills, Pri_work_missing_skills = match_skills(ref_work_skills, jd_Primary_Skills)
-                        Sec_work_matching_skills, Sec_work_missing_skills = match_skills(ref_work_skills, jd_Secondary_Skills)
+                        Pri_work_matching_skills, Pri_work_missing_skills = match_skills(skillmatch_work_skills, jd_Primary_Skills)
+                        Sec_work_matching_skills, Sec_work_missing_skills = match_skills(skillmatch_work_skills, jd_Secondary_Skills)
                         
-                        Pri_project_matching_skills, Pri_project_missing_skills = match_skills(ref_project_skills, jd_Primary_Skills)
-                        Sec_project_matching_skills, Sec_project_missing_skills = match_skills(ref_project_skills, jd_Secondary_Skills)
+                        Pri_project_matching_skills, Pri_project_missing_skills = match_skills(skillmatch_proj_skills, jd_Primary_Skills)
+                        Sec_project_matching_skills, Sec_project_missing_skills = match_skills(skillmatch_proj_skills, jd_Secondary_Skills)
 
 
                         # Percentage match of the primary and secondary skills of  work and project respectively.
@@ -359,8 +362,8 @@ if submit:
                             "Total Required Other Skills": len(Oth_matching_skills) + len(Oth_missing_skills),
                             "Percentage Other Skill Match": per_other_skill_match,
 
-                            "Work Skills": work_skills,
-                            "Project Skills": project_skills,
+                            "Work Skills": skillmatch_work_skills,
+                            "Project Skills": skillmatch_proj_skills,
                             "Total Publications": total_publications,
                             "Copyrights": copyrights,
                             "Patents": patents,
