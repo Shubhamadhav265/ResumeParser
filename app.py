@@ -207,8 +207,16 @@ submit = st.button("Submit")
 
 if submit:
     if uploaded_file is not None and Primary_Skills and Secondary_Skills and Other_Skills:
-        text = input_pdf_text(uploaded_file)
+        res = input_pdf_text(uploaded_file)
         
+        skills_etraction = f""" From the following resume text, extract all skills mentioned under any 
+                                section labeled 'Technical Skills,' 'Skills,' or similar. If the resume 
+                                contains skills mentioned in other sections, extract them as well. Return 
+                                only the skills as a comma-separated list, with no additional information or 
+                                formatting. Ensure the output is in a single line and consistent across 
+                                multiple runs. **Resume**: {res} """
+
+        text = get_gemini_response(skills_etraction)
         # Display the extracted text for debugging
         # st.text_area("Extracted Resume Text", text, height=300, disabled=True)
         st.markdown("###### Etracted Resume")
@@ -394,6 +402,3 @@ if submit:
 
     else:
         st.warning("Please upload a resume and enter a job description.")
-
-
-
