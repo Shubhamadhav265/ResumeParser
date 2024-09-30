@@ -5,7 +5,10 @@ import PyPDF2 as pdf
 from dotenv import load_dotenv
 import json
 import re
+import spacy
 
+# Load a pre-trained NLP model
+nlp = spacy.load("en_core_web_sm")
 
 # Loading environment variables from .env to Python-Environment
 load_dotenv()
@@ -80,7 +83,7 @@ predefined_skills = [
     # Additional Skills
     "SQL", "Git", "Linux", "AWS", "Docker", "Kubernetes", "MySQL Workbench", "OpenShift", "CyberSecurity", 
     "Tkinter", "SMTP", "Object-Oriented Programming (OOP)", "Data Structures and Algorithms", "Cloudinary", 
-    "Slack", "React.js", "Azure", "GitHub", "Selenium", "TensorFlow"
+    "Slack", "React.js", "Azure", "GitHub", "Selenium", "TensorFlow", "Operating Systems"
 ]
 
 # Pre-Defining the standard Certification Courses
@@ -138,21 +141,39 @@ standard_certifications = [
 ]
 
 
-def extract_skills(text):
-    # Convert text to lowercase for case-insensitive matching
+# def extract_skills(text):
+#     # Convert text to lowercase for case-insensitive matching
 
-    # If text is a list, converting it to a single string (Like if JD comes in the form of String)
-    if isinstance(text, list):
-        text = ' '.join(text).lower()  # Join the list into a single string and convert to lowercase
-    else:
-        text = text.lower()  # If text is a string, converting it to lowercase
+#     # If text is a list, converting it to a single string (Like if JD comes in the form of String)
+#     if isinstance(text, list):
+#         text = ' '.join(text).lower()  # Join the list into a single string and convert to lowercase
+#     else:
+#         text = text.lower()  # If text is a string, converting it to lowercase
     
-    # Extract exact keyword matches from the predefined skills list
-    skills = [skill for skill in predefined_skills if re.search(r'\b' + re.escape(skill.lower()) + r'\b', text)]
+#     # Extract exact keyword matches from the predefined skills list
+#     skills = [skill for skill in predefined_skills if re.search(r'\b' + re.escape(skill.lower()) + r'\b', text)]
 
-    # Remove duplicates by converting the list to a set and back to a list
-    print(list(set(skills)))
-    return list(set(skills))
+#     # Remove duplicates by converting the list to a set and back to a list
+#     print(list(set(skills)))
+#     return list(set(skills))
+
+
+def extract_skills(resume_text):
+
+    # Process the resume text
+    doc = nlp(resume_text)
+
+    # Extract skills
+    extracted_skills = []
+    
+    # Check for multi-word skills
+    for skill in predefined_skills:
+        # Use regex to match whole phrases in the resume text
+        if re.search(r'\b' + re.escape(skill) + r'\b', resume_text):
+            extracted_skills.append(skill)
+
+    # Remove duplicates
+    return list(set(extracted_skills))
 
 
 def match_skills(resume_skills, job_description_skills):
